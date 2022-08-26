@@ -11,10 +11,12 @@ from check import Check
 
 
 async def on_startup(dispatcher):
+    logging.warning('Starting webhook connection.')
     await database.connect()
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
 
 async def on_shutdown(dispatcher):
+    logging.warning('Shutting down webhook connection.')
     await database.disconnect()
     await bot.delete_webhook()
 
