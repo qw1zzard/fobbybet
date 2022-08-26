@@ -157,7 +157,7 @@ async def process_help_command(message: types.Message):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    start_webhook(
+    executor.start_webhook(
         dispatcher = dp,
         webhook_path = WEBHOOK_PATH,
         skip_updates = True,
