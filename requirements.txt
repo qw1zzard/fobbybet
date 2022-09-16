@@ -1,3 +1,4 @@
 aiogram~=2.22.1
 requests~=2.28.1
 databases~=0.6.1
+asyncpg~=0.26.0
