@@ -10,12 +10,14 @@ from check import check
 
 
 async def on_startup(dp):
+    """Webhook startup function."""
     logging.warning('Starting webhook connection.')
     await database.connect()
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
 
 
 async def on_shutdown(dp):
+    """Webhook shutdown function."""
     logging.warning('Shutting down webhook connection.')
     await database.disconnect()
     await bot.delete_webhook()
@@ -27,9 +29,9 @@ async def process_start_command(message: types.Message):
     Handle /start command. Display the welcome message.
     """
 
-    await database.execute('INSERT INTO users (user_id, coins) ' +
-                           'VALUES (:user_id, 1000.0)' +
-                           'ON CONFLICT (user_id) DO NOTHING;',
+    await database.execute('INSERT INTO users (user_id, coins) '
+                           + 'VALUES (:user_id, 1000.0)'
+                           + 'ON CONFLICT (user_id) DO NOTHING;',
                            values={'user_id': message.from_user.id})
 
     msg = text('Hi! I\'m Fobby, ', italic('Formula One Betting Bot'),
@@ -46,7 +48,8 @@ async def process_event_command(message: types.Message):
     """
 
     url = 'https://ergast.com/api/f1/current/next.json'
-    response = requests.get(url).json()['MRData']['RaceTable']['Races'][0]
+    response = requests.get(url, timeout=10).json()[
+        'MRData']['RaceTable']['Races'][0]
 
     circuit_name = response['Circuit']['circuitName']
     circuit_link = response['Circuit']['url']
@@ -62,7 +65,8 @@ async def process_drivers_command(message: types.Message):
     """
 
     url = 'https://ergast.com/api/f1/current/drivers.json'
-    response = requests.get(url).json()['MRData']['DriverTable']['Drivers']
+    response = requests.get(url, timeout=10).json()[
+        'MRData']['DriverTable']['Drivers']
 
     msg = text(bold('Number'), '-', bold('Name and Surname'), ':\n', sep=' ')
     for i in response:
@@ -92,17 +96,18 @@ async def bet(user_id, msg) -> bool:
     if 0 < bet_value <= user_coins:
         url = 'https://ergast.com/api/f1/current/next.json'
         next_event = \
-            requests.get(url).json()['MRData']['RaceTable']['Races'][0]['date']
+            requests.get(url, timeout=10).json()[
+                'MRData']['RaceTable']['Races'][0]['date']
 
         await database.execute(
-            'INSERT INTO bets (user_id, event_date, driver_id, bet_value) ' +
-            'VALUES (:user_id, :event_date, :driver_id, :bet_value);',
+            'INSERT INTO bets (user_id, event_date, driver_id, bet_value) '
+            + 'VALUES (:user_id, :event_date, :driver_id, :bet_value);',
             values={'user_id': user_id, 'event_date': next_event,
                     'driver_id': driver_id, 'bet_value': bet_value})
 
         await database.execute(
-            'UPDATE users SET coins = (coins - :bet_value) ' +
-            'WHERE user_id = :user_id;',
+            'UPDATE users SET coins = (coins - :bet_value) '
+            + 'WHERE user_id = :user_id;',
             values={'user_id': user_id, 'bet_value': bet_value})
         return True
     else:
@@ -119,10 +124,10 @@ async def process_bet_command(message: types.Message):
         await message.answer(
             'Sports bet accepted! You can check with the command /check.')
     else:
-        await message.answer('Please, use the format «/bet number size», ' +
-                             'where number - driver\'s number from table '
-                             '/drivers and size is positive real '
-                             'value of the bet.')
+        await message.answer('Please, use the format «/bet number size», '
+                             + 'where number - driver\'s number from table '
+                             + '/drivers and size is positive real '
+                             + 'value of the bet.')
 
 
 @dp.message_handler(commands=['check'])
@@ -168,11 +173,11 @@ async def process_help_command(message: types.Message):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     executor.start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        skip_updates=True,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
+        dispatcher = dp,
+        webhook_path = WEBHOOK_PATH,
+        skip_updates = True,
+        on_startup = on_startup,
+        on_shutdown = on_shutdown,
+        host = WEBAPP_HOST,
+        port = WEBAPP_PORT,
     )

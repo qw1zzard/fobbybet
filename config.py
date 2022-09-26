@@ -1,7 +1,7 @@
+import os
 from aiogram.dispatcher import Dispatcher
 from aiogram import Bot
 from databases import Database
-import os
 
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
