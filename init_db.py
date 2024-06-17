@@ -1,21 +1,19 @@
 import asyncio
 
-from databases import Database
-
-from config import database
+from config import db
 
 
-async def init(database: Database) -> None:
-    await database.connect()
+async def init() -> None:
+    await db.connect()
 
-    await database.execute("""
+    await db.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
             coins REAL DEFAULT 1000
         );
     """)
 
-    await database.execute("""
+    await db.execute("""
         CREATE TABLE IF NOT EXISTS bets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
@@ -26,7 +24,7 @@ async def init(database: Database) -> None:
         );
     """)
 
-    await database.disconnect()
+    await db.disconnect()
 
 
-asyncio.run(init(database))
+asyncio.run(init())

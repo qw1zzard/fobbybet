@@ -14,4 +14,4 @@ dp = Dispatcher()
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 DATABASE_URL = os.getenv('DATABASE_URL')
-database = Database(DATABASE_URL)
+db = Database(DATABASE_URL)
