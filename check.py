@@ -1,10 +1,10 @@
 import requests
-from aiogram.utils.markdown import text, bold
+from aiogram.utils.markdown import bold, text
 
 from config import database
 
 
-async def check(user_id):
+async def check(user_id: int) -> str:
     """
     Display the status of the last and current bets, available balance.
     """
